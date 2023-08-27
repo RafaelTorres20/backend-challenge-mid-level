@@ -16,5 +16,5 @@ type Repository interface {
 }
 
 type AssetService interface {
-	GetAssetByName(ctx context.Context, name string) (Asset, error)
+	GetAssetBySymbol(ctx context.Context, symbol string) (Asset, error)
 }

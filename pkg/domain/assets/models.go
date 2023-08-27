@@ -28,7 +28,7 @@ func NewOrder(o string) Order {
 }
 
 type Asset struct {
-	Name     string          `json:"name"`
+	Symbol   string          `json:"symbol"`
 	Price    decimal.Decimal `json:"price"`
 	Currency string          `json:"currency"`
 }

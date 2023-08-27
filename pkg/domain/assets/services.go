@@ -16,7 +16,7 @@ func (r *logic) AddUserAssets(ctx context.Context, id string, asset Asset) error
 		return ErrUserIDNotFound
 	}
 	//TODO: validate asset
-	if asset.Name == "" {
+	if asset.Symbol == "" {
 		return ErrInvalidAsset
 	}
 	return r.assetRepo.AddUserAssets(ctx, id, asset)
@@ -33,10 +33,10 @@ func (r *logic) GetAssetsByUserID(ctx context.Context, id string) ([]Asset, erro
 // GetAssetsPrices implements Logic.
 func (r *logic) GetAssetsPrices(ctx context.Context, assets []Asset) ([]Asset, error) {
 	for i, asset := range assets {
-		if asset.Name == "" {
+		if asset.Symbol == "" {
 			return nil, ErrInvalidAsset
 		}
-		res, err := r.assetService.GetAssetByName(ctx, asset.Name)
+		res, err := r.assetService.GetAssetBySymbol(ctx, asset.Symbol)
 		if err != nil {
 			return nil, err
 		}
@@ -54,7 +54,7 @@ func (r *logic) OrderUserAssets(ctx context.Context, id string, assets []Asset, 
 	switch order {
 	case Alpha:
 		sort.SliceStable(assets, func(i int, j int) bool {
-			return assets[i].Name < assets[j].Name
+			return assets[i].Symbol < assets[j].Symbol
 		})
 	case Price:
 		sort.SliceStable(assets, func(i int, j int) bool {
@@ -65,7 +65,7 @@ func (r *logic) OrderUserAssets(ctx context.Context, id string, assets []Asset, 
 	for i, asset := range assets {
 		assetUserEnrollments[i] = AssetUserEnrollment{
 			UserID:    id,
-			AssetName: asset.Name,
+			AssetName: asset.Symbol,
 			Position:  i,
 		}
 	}
