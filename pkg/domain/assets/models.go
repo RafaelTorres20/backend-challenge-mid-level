@@ -36,11 +36,6 @@ type Asset struct {
 	Currency string          `json:"currency"`
 }
 
-type User struct {
-	ID     string  `json:"id"`
-	Assets []Asset `json:"assets"`
-}
-
 type AssetUserEnrollment struct {
 	UserID      string `json:"user_id"`
 	AssetSymbol string `json:"asset_symbol"`

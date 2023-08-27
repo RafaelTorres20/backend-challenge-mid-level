@@ -115,7 +115,7 @@ func (r *logic) OrderUserAssets(ctx context.Context, id string, assets []Asset, 
 	return assets, r.assetRepo.UpsertUserAssets(ctx, id, assetUserEnrollments)
 }
 
-func NewAssetLogic(repo Repository, svc AssetService) Logic {
+func NewAssetService(repo Repository, svc AssetService) Logic {
 	return &logic{
 		assetRepo:    repo,
 		assetService: svc,

@@ -1,4 +1,4 @@
-package gateways
+package postgres
 
 import (
 	"context"
@@ -10,12 +10,12 @@ import (
 
 // "select a.name, a.price, a.currency from assets a inner join user_assets_enrollment ua on a.name = ua.asset_name where ua.user_id = $1 order by ua.position asc"
 
-type PostgresRepository struct {
+type AssetRepository struct {
 	db *sql.DB
 }
 
 // AddAssets implements assets.Repository.
-func (r *PostgresRepository) AddAssets(ctx context.Context, asset assets.Asset) error {
+func (r *AssetRepository) AddAssets(ctx context.Context, asset assets.Asset) error {
 	stmt, err := r.db.Prepare("insert into assets (symbol, currency) values ($1, $2)")
 	if err != nil {
 		return err
@@ -30,7 +30,7 @@ func (r *PostgresRepository) AddAssets(ctx context.Context, asset assets.Asset) 
 }
 
 // GetAssetsByUserID implements assets.Repository.
-func (r *PostgresRepository) GetAssetsByUserID(ctx context.Context, id string) ([]assets.Asset, error) {
+func (r *AssetRepository) GetAssetsByUserID(ctx context.Context, id string) ([]assets.Asset, error) {
 	rows, err := r.db.Query(`select a.symbol, a.currency from assets a inner join AssetUserEnrollments ua on a.symbol = ua.asset_symbol where ua.user_id = $1 order by ua.position asc`, id)
 	if err != nil {
 		return nil, err
@@ -54,7 +54,7 @@ var queryUpsertUserAssets string = `INSERT INTO AssetUserEnrollments (user_id, a
 									DO UPDATE SET position = EXCLUDED.position;`
 
 // UpsertUserAssets implements assets.Repository.
-func (r *PostgresRepository) UpsertUserAssets(ctx context.Context, id string, assets []assets.AssetUserEnrollment) error {
+func (r *AssetRepository) UpsertUserAssets(ctx context.Context, id string, assets []assets.AssetUserEnrollment) error {
 	stmt, err := r.db.Prepare(queryUpsertUserAssets)
 	if err != nil {
 		return err
@@ -81,6 +81,6 @@ func (r *PostgresRepository) UpsertUserAssets(ctx context.Context, id string, as
 
 }
 
-func NewPostgresRepository(db *sql.DB) assets.Repository {
-	return &PostgresRepository{db: db}
+func NewAssetsRepository(db *sql.DB) assets.Repository {
+	return &AssetRepository{db: db}
 }

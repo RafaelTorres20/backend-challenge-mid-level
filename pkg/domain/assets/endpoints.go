@@ -18,11 +18,11 @@ func NewEndpoints(logic Logic) Endpoints {
 		logic: logic,
 	}
 	router := chi.NewRouter()
-	router.Post("/users/{id}/assets", endpoints.AddUserAssets)
-	router.Post("/assets", endpoints.AddAssets)
-	router.Get("/users/{id}/assets", endpoints.GetAssetsByUserID)
-	router.Post("/users/{id}/assets/order", endpoints.OrderUserAssets)
-	router.Post("/assets/prices", endpoints.GetAssetsPrices)
+	router.Post("/users/{id}", endpoints.AddUserAssets)
+	router.Post("/", endpoints.AddAssets)
+	router.Get("/users/{id}", endpoints.GetAssetsByUserID)
+	router.Post("/users/{id}/order", endpoints.OrderUserAssets)
+	router.Post("/prices", endpoints.GetAssetsPrices)
 	endpoints.router = router
 	return endpoints
 }

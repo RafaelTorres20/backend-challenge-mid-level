@@ -9,7 +9,9 @@ import (
 
 	"github.com/RafaelTorres20/backend-challenge-mid-level/pkg/api"
 	"github.com/RafaelTorres20/backend-challenge-mid-level/pkg/domain/assets"
+	"github.com/RafaelTorres20/backend-challenge-mid-level/pkg/domain/users"
 	"github.com/RafaelTorres20/backend-challenge-mid-level/pkg/gateways"
+	"github.com/RafaelTorres20/backend-challenge-mid-level/pkg/gateways/postgres"
 	"github.com/spf13/cobra"
 )
 
@@ -25,11 +27,14 @@ var serverCmd = &cobra.Command{
 			log.Fatal(err)
 		}
 		apiKey := os.Getenv("KEY")
-		pg := gateways.NewPostgresRepository(db)
+		assetsRepository := postgres.NewAssetsRepository(db)
+		usersRepository := postgres.NewUsersRepository(db)
 		yahooClient := gateways.NewYahooClient(http.DefaultClient, "https://yfapi.net/v6/finance/quote", apiKey)
-		logic := assets.NewAssetLogic(pg, yahooClient)
-		assetsEndpoints := assets.NewEndpoints(logic)
-		svc := api.NewServer(assetsEndpoints)
+		assetsService := assets.NewAssetService(assetsRepository, yahooClient)
+		usersService := users.NewUsersService(usersRepository)
+		assetsEndpoints := assets.NewEndpoints(assetsService)
+		usersEndpoints := users.NewEndpoints(usersService)
+		svc := api.NewServer(assetsEndpoints, usersEndpoints)
 		go svc.Serve(8080)
 		log.Println("Running port 8080")
 
