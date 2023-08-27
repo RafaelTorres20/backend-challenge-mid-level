@@ -18,9 +18,13 @@ var serverCmd = &cobra.Command{
 	Short: "Serves user services",
 	RunE: func(cmd *cobra.Command, args []string) error {
 
-		db := newPostgresqlConection("postgres://postgres:postgres@postgres:5432/assets?sslmode=disable")
+		db := newPostgresqlConection("postgres://postgres:postgres@localhost:5432/assets?sslmode=disable")
 		defer db.Close()
-		apiKey := os.Getenv("X-API-KEY")
+		err := db.Ping()
+		if err != nil {
+			log.Fatal(err)
+		}
+		apiKey := os.Getenv("KEY")
 		pg := gateways.NewPostgresRepository(db)
 		yahooClient := gateways.NewYahooClient(http.DefaultClient, "https://yfapi.net/v6/finance/quote", apiKey)
 		logic := assets.NewAssetLogic(pg, yahooClient)

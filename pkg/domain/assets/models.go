@@ -9,17 +9,20 @@ import (
 type Order string
 
 var (
-	Alpha  Order = "alpha"
-	Price  Order = "price"
-	Custom Order = "custom"
+	Alpha        Order = "alpha"
+	LessPrice    Order = "lessPrice"
+	GreaterPrice Order = "greaterPrice"
+	Custom       Order = "custom"
 )
 
 func NewOrder(o string) Order {
 	switch strings.ToLower(o) {
 	case "alpha":
 		return Alpha
-	case "price":
-		return Price
+	case "lessPrice":
+		return LessPrice
+	case "greaterPrice":
+		return GreaterPrice
 	case "custom":
 		return Custom
 	default:

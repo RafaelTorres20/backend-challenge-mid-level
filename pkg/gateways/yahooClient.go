@@ -3,6 +3,7 @@ package gateways
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 
@@ -17,9 +18,9 @@ type yahooClient struct {
 }
 
 type Result struct {
-	Price    string `json:"regularMarketPrice"`
-	Symbol   string `json:"symbol"`
-	Currency string `json:"currency"`
+	Price    float64 `json:"regularMarketPrice"`
+	Symbol   string  `json:"symbol"`
+	Currency string  `json:"currency"`
 }
 
 type QuoteResponse struct {
@@ -51,7 +52,9 @@ func (c *yahooClient) GetAssetBySymbol(ctx context.Context, symbol string) (asse
 		return assets.Asset{}, err
 	}
 	defer res.Body.Close()
-
+	if res.StatusCode != http.StatusOK {
+		return assets.Asset{}, fmt.Errorf("unexpected status code: %d", res.StatusCode)
+	}
 	responseDTO := new(YahooResponseDTO)
 	b, err := io.ReadAll(res.Body)
 	if err != nil {
@@ -66,10 +69,7 @@ func (c *yahooClient) GetAssetBySymbol(ctx context.Context, symbol string) (asse
 		return assets.Asset{}, assets.ErrAssetNotFound
 	}
 
-	price, err := decimal.NewFromString(responseDTO.QuoteResponse.Result[0].Price)
-	if err != nil {
-		return assets.Asset{}, err
-	}
+	price := decimal.NewFromFloat(responseDTO.QuoteResponse.Result[0].Price)
 
 	asset := assets.Asset{
 		Symbol:   responseDTO.QuoteResponse.Result[0].Symbol,

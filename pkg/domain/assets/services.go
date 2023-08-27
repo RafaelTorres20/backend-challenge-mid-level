@@ -33,12 +33,26 @@ func (r *logic) AddUserAssets(ctx context.Context, id string, asset Asset) error
 	return r.assetRepo.UpsertUserAssets(ctx, id, []AssetUserEnrollment{enrollment})
 }
 
+// AddAssets implements Logic.
+func (r *logic) AddAssets(ctx context.Context, asset Asset) error {
+	if asset.Symbol == "" {
+		return ErrInvalidAsset
+	}
+
+	return r.assetRepo.AddAssets(ctx, asset)
+}
+
 // GetAssetsByUserID implements Logic.
 func (r *logic) GetAssetsByUserID(ctx context.Context, id string) ([]Asset, error) {
 	if id == "" {
 		return nil, ErrUserIDNotFound
 	}
-	return r.assetRepo.GetAssetsByUserID(ctx, id)
+	assets, err := r.assetRepo.GetAssetsByUserID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	return r.GetAssetsPrices(ctx, assets)
 }
 
 // GetAssetsPrices implements Logic.
@@ -61,17 +75,35 @@ func (r *logic) OrderUserAssets(ctx context.Context, id string, assets []Asset, 
 	if id == "" {
 		return nil, ErrUserIDNotFound
 	}
-
+	if len(assets) != 0 {
+		var err error
+		assets, err = r.GetAssetsByUserID(ctx, id)
+		if err != nil {
+			return nil, err
+		}
+	}
+	assets, err := r.GetAssetsPrices(ctx, assets)
+	if err != nil {
+		return nil, err
+	}
 	switch order {
 	case Alpha:
+
 		sort.SliceStable(assets, func(i int, j int) bool {
 			return assets[i].Symbol < assets[j].Symbol
 		})
-	case Price:
+	case LessPrice:
+
 		sort.SliceStable(assets, func(i int, j int) bool {
 			return assets[i].Price.LessThan(assets[j].Price)
 		})
+	case GreaterPrice:
+
+		sort.SliceStable(assets, func(i int, j int) bool {
+			return assets[i].Price.GreaterThan(assets[j].Price)
+		})
 	}
+
 	assetUserEnrollments := make([]AssetUserEnrollment, len(assets))
 	for i, asset := range assets {
 		assetUserEnrollments[i] = AssetUserEnrollment{

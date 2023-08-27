@@ -18,8 +18,8 @@ func NewServer(assetsEndpoints assets.Endpoints) *server {
 		assetsEndpoints: assetsEndpoints,
 		router:          chi.NewRouter(),
 	}
-
 	server.router.Mount("/", assetsEndpoints.Router())
+
 	return server
 }
 

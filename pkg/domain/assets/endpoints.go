@@ -19,6 +19,7 @@ func NewEndpoints(logic Logic) Endpoints {
 	}
 	router := chi.NewRouter()
 	router.Post("/users/{id}/assets", endpoints.AddUserAssets)
+	router.Post("/assets", endpoints.AddAssets)
 	router.Get("/users/{id}/assets", endpoints.GetAssetsByUserID)
 	router.Post("/users/{id}/assets/order", endpoints.OrderUserAssets)
 	router.Post("/assets/prices", endpoints.GetAssetsPrices)
@@ -45,18 +46,18 @@ func (e *Endpoints) AddUserAssets(w http.ResponseWriter, r *http.Request) {
 
 	asset := new(AddUserAssetsRequest)
 	if err := render.Bind(r, asset); err != nil {
-		render.Status(r, http.StatusBadRequest)
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	err := e.logic.AddUserAssets(r.Context(), id, asset.Asset)
 	if err != nil {
 		log.Println(err)
-		render.Status(r, http.StatusInternalServerError)
+		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	render.Status(r, http.StatusCreated)
+	w.WriteHeader(http.StatusCreated)
 }
 
 // GetAssetsByUserID implements Endpoints.
@@ -66,7 +67,7 @@ func (e *Endpoints) GetAssetsByUserID(w http.ResponseWriter, r *http.Request) {
 	assets, err := e.logic.GetAssetsByUserID(r.Context(), id)
 	if err != nil {
 		log.Println(err)
-		render.Status(r, http.StatusInternalServerError)
+		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
@@ -86,16 +87,18 @@ func (g *GetAssetPricesRequest) Bind(r *http.Request) error {
 
 // GetAssetsPrices implements Endpoints.
 func (e *Endpoints) GetAssetsPrices(w http.ResponseWriter, r *http.Request) {
+
 	assets := new(GetAssetPricesRequest)
 	if err := render.Bind(r, assets); err != nil {
-		render.Status(r, http.StatusBadRequest)
+		log.Println(err)
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	res, err := e.logic.GetAssetsPrices(r.Context(), assets.Assets)
 	if err != nil {
 		log.Println(err)
-		render.Status(r, http.StatusInternalServerError)
+		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
@@ -120,16 +123,43 @@ func (e *Endpoints) OrderUserAssets(w http.ResponseWriter, r *http.Request) {
 
 	assets := new(OrderUserAssetsRequest)
 	if err := render.Bind(r, assets); err != nil {
-		render.Status(r, http.StatusBadRequest)
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	res, err := e.logic.OrderUserAssets(r.Context(), id, assets.Assets, assets.Order)
 	if err != nil {
 		log.Println(err)
-		render.Status(r, http.StatusInternalServerError)
+		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
 	render.JSON(w, r, res)
+}
+
+// AddAssetsRequest represents the request body for AddAssets.
+type AddAssetsRequest struct {
+	Asset
+}
+
+func (*AddAssetsRequest) Bind(r *http.Request) error {
+	return nil
+}
+
+// AddAssets implements Endpoints.
+func (e *Endpoints) AddAssets(w http.ResponseWriter, r *http.Request) {
+	asset := new(AddAssetsRequest)
+	if err := render.Bind(r, asset); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	err := e.logic.AddAssets(r.Context(), asset.Asset)
+	if err != nil {
+		log.Println(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusCreated)
 }
