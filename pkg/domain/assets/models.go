@@ -39,7 +39,7 @@ type User struct {
 }
 
 type AssetUserEnrollment struct {
-	UserID    string `json:"user_id"`
-	AssetName string `json:"asset_name"`
-	Position  int    `json:"position"`
+	UserID      string `json:"user_id"`
+	AssetSymbol string `json:"asset_symbol"`
+	Position    int    `json:"position"`
 }

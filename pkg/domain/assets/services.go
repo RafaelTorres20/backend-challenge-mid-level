@@ -19,7 +19,18 @@ func (r *logic) AddUserAssets(ctx context.Context, id string, asset Asset) error
 	if asset.Symbol == "" {
 		return ErrInvalidAsset
 	}
-	return r.assetRepo.AddUserAssets(ctx, id, asset)
+
+	assets, err := r.GetAssetsByUserID(ctx, id)
+	if err != nil {
+		return err
+	}
+
+	enrollment := AssetUserEnrollment{
+		UserID:      id,
+		AssetSymbol: asset.Symbol,
+		Position:    len(assets),
+	}
+	return r.assetRepo.UpsertUserAssets(ctx, id, []AssetUserEnrollment{enrollment})
 }
 
 // GetAssetsByUserID implements Logic.
@@ -64,14 +75,17 @@ func (r *logic) OrderUserAssets(ctx context.Context, id string, assets []Asset, 
 	assetUserEnrollments := make([]AssetUserEnrollment, len(assets))
 	for i, asset := range assets {
 		assetUserEnrollments[i] = AssetUserEnrollment{
-			UserID:    id,
-			AssetName: asset.Symbol,
-			Position:  i,
+			UserID:      id,
+			AssetSymbol: asset.Symbol,
+			Position:    i,
 		}
 	}
 	return assets, r.assetRepo.UpsertUserAssets(ctx, id, assetUserEnrollments)
 }
 
-func NewAssetLogic() Logic {
-	return &logic{}
+func NewAssetLogic(repo Repository, svc AssetService) Logic {
+	return &logic{
+		assetRepo:    repo,
+		assetService: svc,
+	}
 }

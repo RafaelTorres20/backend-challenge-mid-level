@@ -1,0 +1,35 @@
+version: '3.4'
+
+services:
+  postgres:
+    image: postgres:15.4-alpine
+    platform: linux/amd64
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+      - DATABASE_PORT=5432
+    ports:
+      - 5432:5432
+    volumes:
+      - $PWD/volumes/postgres:/var/lib/postgresql/data
+  app:
+    build: .
+    x-develop:
+      watch:
+        - action: rebuild
+          path: ./pkg
+    depends_on:
+      - postgres
+    environment:
+      - X-API-KEY=V3a7TjzP7X7UDQC3ih6qj1XhHaNutjx571OtacPs
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+      - DATABASE_PORT=5432
+    ports:
+      - 8080:8080
+volumes:
+  postgres:
+    driver: local

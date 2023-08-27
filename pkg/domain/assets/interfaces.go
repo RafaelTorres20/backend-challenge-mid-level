@@ -11,7 +11,7 @@ type Logic interface {
 
 type Repository interface {
 	GetAssetsByUserID(ctx context.Context, id string) ([]Asset, error)
-	AddUserAssets(ctx context.Context, id string, asset Asset) error
+	AddAssets(ctx context.Context, asset Asset) error
 	UpsertUserAssets(ctx context.Context, id string, assets []AssetUserEnrollment) error
 }
 

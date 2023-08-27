@@ -8,4 +8,5 @@ var (
 	ErrUserNotFound        = errors.New("user not found")
 	ErrInvalidAsset        = errors.New("invalid asset")
 	ErrUserIDNotFound      = errors.New("user id not found")
+	ErrBadRequest          = errors.New("bad request")
 )
