@@ -8,12 +8,13 @@ services:
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=postgres
+      - POSTGRES_DB=assets
       - DATABASE_PORT=5432
     ports:
       - 5432:5432
     volumes:
       - $PWD/volumes/postgres:/var/lib/postgresql/data
+      - ./scripts/database.sql:/docker-entrypoint-initdb.d/database.sql
 volumes:
   postgres:
     driver: local

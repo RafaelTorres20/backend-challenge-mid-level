@@ -3,6 +3,7 @@ package postgres
 import (
 	"context"
 	"database/sql"
+	"fmt"
 
 	"github.com/RafaelTorres20/backend-challenge-mid-level/pkg/domain/users"
 	"github.com/rs/xid"
@@ -17,11 +18,13 @@ type UsersRepository struct {
 func (u *UsersRepository) Create(ctx context.Context, user *users.User) error {
 	stmt, err := u.db.Prepare("insert into users (id, email, password) values ($1, $2, $3)")
 	if err != nil {
+		fmt.Println(err)
 		return err
 	}
 
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), 10)
 	if err != nil {
+		fmt.Println(err)
 		return err
 	}
 
@@ -29,6 +32,7 @@ func (u *UsersRepository) Create(ctx context.Context, user *users.User) error {
 
 	_, err = stmt.Exec(id, user.Email, hashedPassword)
 	if err != nil {
+		fmt.Println(err)
 		return err
 	}
 
@@ -39,21 +43,25 @@ func (u *UsersRepository) Create(ctx context.Context, user *users.User) error {
 func (u *UsersRepository) DeleteByID(ctx context.Context, id string) error {
 	stmt, err := u.db.Prepare("delete from users where id = $1")
 	if err != nil {
+		fmt.Println(err)
 		return err
 	}
 
 	tx, err := u.db.Begin()
 	if err != nil {
+		fmt.Println(err)
 		return err
 	}
 
 	_, err = tx.Stmt(stmt).Exec(id)
 	if err != nil {
+		fmt.Println(err)
 		return err
 	}
 
 	err = tx.Commit()
 	if err != nil {
+		fmt.Println(err)
 		return err
 	}
 
@@ -72,6 +80,7 @@ func (u *UsersRepository) GetByEmail(ctx context.Context, email string) (*users.
 	user := new(users.User)
 	err := row.Scan(&user.ID, &user.Email, &user.Password)
 	if err != nil {
+		fmt.Println(err)
 		return nil, err
 	}
 
@@ -90,6 +99,7 @@ func (u *UsersRepository) GetByID(ctx context.Context, id string) (*users.User, 
 	user := new(users.User)
 	err := row.Scan(&user.ID, &user.Email, &user.Password)
 	if err != nil {
+		fmt.Println(err)
 		return nil, err
 	}
 
@@ -106,21 +116,25 @@ func (u *UsersRepository) UpdateByID(ctx context.Context, id string, user *users
 
 	tx, err := u.db.Begin()
 	if err != nil {
+		fmt.Println(err)
 		return err
 	}
 
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), 10)
 	if err != nil {
+		fmt.Println(err)
 		return err
 	}
 
 	_, err = tx.Stmt(stmt).Exec(user.Email, hashedPassword, id)
 	if err != nil {
+		fmt.Println(err)
 		return err
 	}
 
 	err = tx.Commit()
 	if err != nil {
+		fmt.Println(err)
 		return err
 	}
 

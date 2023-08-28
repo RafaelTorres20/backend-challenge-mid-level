@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 
@@ -22,6 +23,7 @@ func (*CreateRequest) Bind(r *http.Request) error {
 func (e *server) Create(w http.ResponseWriter, r *http.Request) {
 	user := new(CreateRequest)
 	if err := render.Bind(r, user); err != nil {
+		fmt.Println(err)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}

@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -19,8 +20,15 @@ var serverCmd = &cobra.Command{
 	Use:   "server",
 	Short: "Serves user services",
 	RunE: func(cmd *cobra.Command, args []string) error {
+		dbUser := os.Getenv("POSTGRES_USER")
+		dbPassword := os.Getenv("POSTGRES_PASSWORD")
+		dbHost := os.Getenv("DATABASE_HOST")
+		dbPort := os.Getenv("DATABASE_PORT")
+		dbName := os.Getenv("POSTGRES_DB")
 
-		db := newPostgresqlConection("postgres://postgres:postgres@localhost:5432/assets?sslmode=disable")
+		// Crie a string de conexão
+		connectionString := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable", dbUser, dbPassword, dbHost, dbPort, dbName)
+		db := newPostgresqlConection(connectionString)
 		defer db.Close()
 		err := db.Ping()
 		if err != nil {
