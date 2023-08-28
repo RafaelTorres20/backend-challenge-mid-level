@@ -75,7 +75,7 @@ func (r *logic) OrderUserAssets(ctx context.Context, id string, assets []Asset, 
 	if id == "" {
 		return nil, ErrUserIDNotFound
 	}
-	if len(assets) != 0 {
+	if len(assets) == 0 {
 		var err error
 		assets, err = r.GetAssetsByUserID(ctx, id)
 		if err != nil {
@@ -88,17 +88,14 @@ func (r *logic) OrderUserAssets(ctx context.Context, id string, assets []Asset, 
 	}
 	switch order {
 	case Alpha:
-
 		sort.SliceStable(assets, func(i int, j int) bool {
 			return assets[i].Symbol < assets[j].Symbol
 		})
 	case LessPrice:
-
 		sort.SliceStable(assets, func(i int, j int) bool {
 			return assets[i].Price.LessThan(assets[j].Price)
 		})
 	case GreaterPrice:
-
 		sort.SliceStable(assets, func(i int, j int) bool {
 			return assets[i].Price.GreaterThan(assets[j].Price)
 		})

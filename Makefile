@@ -1,2 +1,7 @@
 SHELL:=/bin/bash
-run: docker-compose up -d && docker compose alpha watch
+
+# Load environment variables from .env
+include .env
+
+run:
+	go run main.go server

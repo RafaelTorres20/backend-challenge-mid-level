@@ -1,0 +1,246 @@
+{
+	"info": {
+		"_postman_id": "df6454db-7294-4be0-81d4-4697a8d35b8b",
+		"name": "cvtm",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "27527391"
+	},
+	"item": [
+		{
+			"name": "assets",
+			"item": [
+				{
+					"name": "addAssets",
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"content-type": true
+						}
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"symbol\": \"GOGL\",\n    \"currency\": \"USD\"\n}"
+						},
+						"url": "http://localhost:8080/assets"
+					},
+					"response": []
+				},
+				{
+					"name": "addUserAssets",
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"content-type": true
+						}
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"symbol\": \"MGLU3.SA\",\n    \"currency\": \"BRL\"\n}"
+						},
+						"url": "http://localhost:8080/users/id/assets"
+					},
+					"response": []
+				},
+				{
+					"name": "getAssetsByUserID",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true,
+						"disabledSystemHeaders": {
+							"content-type": true
+						}
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": "http://localhost:8080/users/id/assets"
+					},
+					"response": []
+				},
+				{
+					"name": "OrderUserAssets",
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"content-type": true
+						}
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"order\": \"custom\",\n    \"assets\": [\n        {\n            \"symbol\": \"GOGL\"\n        },\n        {\n            \"symbol\": \"AAPL\"\n        },\n        {\n            \"symbol\": \"MGLU3.SA\"\n        }\n    ]\n}"
+						},
+						"url": "http://localhost:8080/users/id/assets/order"
+					},
+					"response": []
+				},
+				{
+					"name": "getAssetsPrices",
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"content-type": true
+						}
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"assets\": [\n        {\n            \"symbol\": \"AAPL\"\n        },\n        {\n            \"symbol\": \"MGLU3.SA\"\n        }\n    ]\n}"
+						},
+						"url": "http://localhost:8080/assets/prices"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "users",
+			"item": [
+				{
+					"name": "getUserByID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8080/users/id"
+					},
+					"response": []
+				},
+				{
+					"name": "getUserByEmail",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8080/users/email/rafael@torres.com"
+					},
+					"response": []
+				},
+				{
+					"name": "login",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8080/users/email/rafael@torres.com"
+					},
+					"response": []
+				},
+				{
+					"name": "createUser",
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"content-type": true
+						}
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"rafael@torres.com\",\n    \"password\": \"123\"\n}"
+						},
+						"url": "http://localhost:8080/users"
+					},
+					"response": []
+				},
+				{
+					"name": "deleteUserByID",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/users/cjlsb2j82vs93co7lmsg",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"users",
+								"cjlsb2j82vs93co7lmsg"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "cjlsb2j82vs93co7lmsg",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "updateUserByID",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/users/cjlsb2j82vs93co7lmsg",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"users",
+								"cjlsb2j82vs93co7lmsg"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "cjlsb2j82vs93co7lmsg",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
