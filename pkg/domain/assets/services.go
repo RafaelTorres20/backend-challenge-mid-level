@@ -6,8 +6,8 @@ import (
 )
 
 type logic struct {
-	assetRepo    Repository
-	assetService AssetService
+	assetRepo Repository
+	yahoo     YahooService
 }
 
 // AddUserAssets implements Logic.
@@ -61,7 +61,7 @@ func (r *logic) GetAssetsPrices(ctx context.Context, assets []Asset) ([]Asset, e
 		if asset.Symbol == "" {
 			return nil, ErrInvalidAsset
 		}
-		res, err := r.assetService.GetAssetBySymbol(ctx, asset.Symbol)
+		res, err := r.yahoo.GetAssetBySymbol(ctx, asset.Symbol)
 		if err != nil {
 			return nil, err
 		}
@@ -115,9 +115,9 @@ func (r *logic) OrderUserAssets(ctx context.Context, id string, assets []Asset, 
 	return assets, r.assetRepo.UpsertUserAssets(ctx, id, assetUserEnrollments)
 }
 
-func NewAssetService(repo Repository, svc AssetService) Logic {
+func NewAssetService(repo Repository, svc YahooService) Service {
 	return &logic{
-		assetRepo:    repo,
-		assetService: svc,
+		assetRepo: repo,
+		yahoo:     svc,
 	}
 }

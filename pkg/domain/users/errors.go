@@ -8,4 +8,5 @@ var (
 	ErrInvalidID       = errors.New("invalid id")
 	ErrInvalidEmail    = errors.New("invalid email")
 	ErrEmailNotFound   = errors.New("email not found")
+	ErrUserNotFound    = errors.New("user not found")
 )

@@ -2,7 +2,7 @@ package assets
 
 import "context"
 
-type Logic interface {
+type Service interface {
 	GetAssetsByUserID(ctx context.Context, id string) ([]Asset, error)
 	AddUserAssets(ctx context.Context, id string, asset Asset) error
 	AddAssets(ctx context.Context, asset Asset) error
@@ -16,6 +16,6 @@ type Repository interface {
 	UpsertUserAssets(ctx context.Context, id string, assets []AssetUserEnrollment) error
 }
 
-type AssetService interface {
+type YahooService interface {
 	GetAssetBySymbol(ctx context.Context, symbol string) (Asset, error)
 }

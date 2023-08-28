@@ -80,7 +80,7 @@ func (c *yahooClient) GetAssetBySymbol(ctx context.Context, symbol string) (asse
 	return asset, nil
 }
 
-func NewYahooClient(client *http.Client, baseURL string, apiKey string) assets.AssetService {
+func NewYahooClient(client *http.Client, baseURL string, apiKey string) assets.YahooService {
 	if client == nil {
 		client = http.DefaultClient
 	}

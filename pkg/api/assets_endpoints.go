@@ -1,47 +1,25 @@
-package assets
+package api
 
 import (
 	"log"
 	"net/http"
 
+	"github.com/RafaelTorres20/backend-challenge-mid-level/pkg/domain/assets"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 )
 
-type Endpoints struct {
-	logic  Logic
-	router *chi.Mux
-}
-
-func NewEndpoints(logic Logic) Endpoints {
-	endpoints := Endpoints{
-		logic: logic,
-	}
-	router := chi.NewRouter()
-	router.Post("/users/{id}", endpoints.AddUserAssets)
-	router.Post("/", endpoints.AddAssets)
-	router.Get("/users/{id}", endpoints.GetAssetsByUserID)
-	router.Post("/users/{id}/order", endpoints.OrderUserAssets)
-	router.Post("/prices", endpoints.GetAssetsPrices)
-	endpoints.router = router
-	return endpoints
-}
-
-func (e *Endpoints) Router() *chi.Mux {
-	return e.router
-}
-
 // AddUserAssetsRequest represents the request body for AddUserAssets.
 type AddUserAssetsRequest struct {
-	Asset
+	assets.Asset
 }
 
 func (*AddUserAssetsRequest) Bind(r *http.Request) error {
 	return nil
 }
 
-// AddUserAssets implements Endpoints.
-func (e *Endpoints) AddUserAssets(w http.ResponseWriter, r *http.Request) {
+// AddUserAssets implements server.
+func (e *server) AddUserAssets(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 
 	asset := new(AddUserAssetsRequest)
@@ -50,7 +28,7 @@ func (e *Endpoints) AddUserAssets(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err := e.logic.AddUserAssets(r.Context(), id, asset.Asset)
+	err := e.assetsServices.AddUserAssets(r.Context(), id, asset.Asset)
 	if err != nil {
 		log.Println(err)
 		w.WriteHeader(http.StatusInternalServerError)
@@ -60,11 +38,11 @@ func (e *Endpoints) AddUserAssets(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 }
 
-// GetAssetsByUserID implements Endpoints.
-func (e *Endpoints) GetAssetsByUserID(w http.ResponseWriter, r *http.Request) {
+// GetAssetsByUserID implements server.
+func (e *server) GetAssetsByUserID(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 
-	assets, err := e.logic.GetAssetsByUserID(r.Context(), id)
+	assets, err := e.assetsServices.GetAssetsByUserID(r.Context(), id)
 	if err != nil {
 		log.Println(err)
 		w.WriteHeader(http.StatusInternalServerError)
@@ -75,18 +53,18 @@ func (e *Endpoints) GetAssetsByUserID(w http.ResponseWriter, r *http.Request) {
 }
 
 type GetAssetPricesRequest struct {
-	Assets []Asset `json:"assets"`
+	Assets []assets.Asset `json:"assets"`
 }
 
 func (g *GetAssetPricesRequest) Bind(r *http.Request) error {
 	if len(g.Assets) == 0 {
-		return ErrBadRequest
+		return assets.ErrBadRequest
 	}
 	return nil
 }
 
-// GetAssetsPrices implements Endpoints.
-func (e *Endpoints) GetAssetsPrices(w http.ResponseWriter, r *http.Request) {
+// GetAssetsPrices implements server.
+func (e *server) GetAssetsPrices(w http.ResponseWriter, r *http.Request) {
 
 	assets := new(GetAssetPricesRequest)
 	if err := render.Bind(r, assets); err != nil {
@@ -95,7 +73,7 @@ func (e *Endpoints) GetAssetsPrices(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	res, err := e.logic.GetAssetsPrices(r.Context(), assets.Assets)
+	res, err := e.assetsServices.GetAssetsPrices(r.Context(), assets.Assets)
 	if err != nil {
 		log.Println(err)
 		w.WriteHeader(http.StatusInternalServerError)
@@ -106,19 +84,19 @@ func (e *Endpoints) GetAssetsPrices(w http.ResponseWriter, r *http.Request) {
 }
 
 type OrderUserAssetsRequest struct {
-	Assets []Asset `json:"assets"`
-	Order  Order   `json:"order"`
+	Assets []assets.Asset `json:"assets"`
+	Order  assets.Order   `json:"order"`
 }
 
 func (o *OrderUserAssetsRequest) Bind(r *http.Request) error {
 	if len(o.Assets) == 0 {
-		return ErrBadRequest
+		return assets.ErrBadRequest
 	}
 	return nil
 }
 
-// OrderUserAssets implements Endpoints.
-func (e *Endpoints) OrderUserAssets(w http.ResponseWriter, r *http.Request) {
+// OrderUserAssets implements server.
+func (e *server) OrderUserAssets(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 
 	assets := new(OrderUserAssetsRequest)
@@ -127,7 +105,7 @@ func (e *Endpoints) OrderUserAssets(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	res, err := e.logic.OrderUserAssets(r.Context(), id, assets.Assets, assets.Order)
+	res, err := e.assetsServices.OrderUserAssets(r.Context(), id, assets.Assets, assets.Order)
 	if err != nil {
 		log.Println(err)
 		w.WriteHeader(http.StatusInternalServerError)
@@ -139,22 +117,22 @@ func (e *Endpoints) OrderUserAssets(w http.ResponseWriter, r *http.Request) {
 
 // AddAssetsRequest represents the request body for AddAssets.
 type AddAssetsRequest struct {
-	Asset
+	assets.Asset
 }
 
 func (*AddAssetsRequest) Bind(r *http.Request) error {
 	return nil
 }
 
-// AddAssets implements Endpoints.
-func (e *Endpoints) AddAssets(w http.ResponseWriter, r *http.Request) {
+// AddAssets implements server.
+func (e *server) AddAssets(w http.ResponseWriter, r *http.Request) {
 	asset := new(AddAssetsRequest)
 	if err := render.Bind(r, asset); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	err := e.logic.AddAssets(r.Context(), asset.Asset)
+	err := e.assetsServices.AddAssets(r.Context(), asset.Asset)
 	if err != nil {
 		log.Println(err)
 		w.WriteHeader(http.StatusInternalServerError)

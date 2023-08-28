@@ -32,9 +32,7 @@ var serverCmd = &cobra.Command{
 		yahooClient := gateways.NewYahooClient(http.DefaultClient, "https://yfapi.net/v6/finance/quote", apiKey)
 		assetsService := assets.NewAssetService(assetsRepository, yahooClient)
 		usersService := users.NewUsersService(usersRepository)
-		assetsEndpoints := assets.NewEndpoints(assetsService)
-		usersEndpoints := users.NewEndpoints(usersService)
-		svc := api.NewServer(assetsEndpoints, usersEndpoints)
+		svc := api.NewServer(assetsService, usersService)
 		go svc.Serve(8080)
 		log.Println("Running port 8080")
 

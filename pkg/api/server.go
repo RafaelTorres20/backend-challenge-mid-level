@@ -10,18 +10,31 @@ import (
 )
 
 type server struct {
-	assetsEndpoints assets.Endpoints
-	usersEndpoints  users.Endpoints
-	router          *chi.Mux
+	router         *chi.Mux
+	assetsServices assets.Service
+	usersService   users.Service
 }
 
-func NewServer(assetsEndpoints assets.Endpoints, usersEndpoints users.Endpoints) *server {
+func NewServer(assetsServices assets.Service, usersService users.Service) *server {
+	r := chi.NewRouter()
 	server := &server{
-		assetsEndpoints: assetsEndpoints,
-		router:          chi.NewRouter(),
+		router:         r,
+		assetsServices: assetsServices,
+		usersService:   usersService,
 	}
-	server.router.Mount("/assets", assetsEndpoints.Router())
-	server.router.Mount("/users", usersEndpoints.Router())
+
+	server.router.Post("/users/", server.Create)
+	server.router.Post("/users/login", server.Login)
+
+	server.router.With(ValidateJWTMiddleware).Post("/assets/users/{id}", server.AddUserAssets)
+	server.router.With(ValidateJWTMiddleware).Post("/assets/", server.AddAssets)
+	server.router.With(ValidateJWTMiddleware).Get("/assets/users/{id}", server.GetAssetsByUserID)
+	server.router.With(ValidateJWTMiddleware).Post("/assets/users/{id}/order", server.OrderUserAssets)
+	server.router.With(ValidateJWTMiddleware).Post("/assets/prices", server.GetAssetsPrices)
+	server.router.With(ValidateJWTMiddleware).Delete("/users/{id}", server.DeleteByID)
+	server.router.With(ValidateJWTMiddleware).Get("/users/{id}", server.GetByID)
+	server.router.With(ValidateJWTMiddleware).Get("/users/email/{email}", server.GetByEmail)
+	server.router.With(ValidateJWTMiddleware).Put("/users/{id}", server.UpdateByID)
 
 	return server
 }

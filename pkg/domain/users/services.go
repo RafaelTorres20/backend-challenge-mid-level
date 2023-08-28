@@ -2,10 +2,68 @@ package users
 
 import (
 	"context"
+	"os"
+	"time"
+
+	"github.com/dgrijalva/jwt-go"
+	"golang.org/x/crypto/bcrypt"
 )
+
+var secretKey string = os.Getenv("JWT_SECRET")
 
 type service struct {
 	userRepo UserRepo
+}
+
+// GenerateJWT implements UserService.
+func (*service) GenerateJWT(email string) (string, error) {
+
+	claims := jwt.StandardClaims{
+		ExpiresAt: time.Now().Add(time.Hour * 24).Unix(), // Token expira em 24 horas
+		Subject:   email,
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+
+	signedToken, err := token.SignedString([]byte(secretKey))
+	if err != nil {
+		return "", err
+	}
+	return signedToken, nil
+
+}
+
+// Login implements UserService.
+func (u *service) Login(ctx context.Context, email string, password string) (*User, string, error) {
+	if email == "" {
+		return nil, "", ErrInvalidUser
+	}
+
+	if password == "" {
+		return nil, "", ErrInvalidPassword
+	}
+
+	user, err := u.GetByEmail(ctx, email)
+
+	if user == nil {
+		return nil, "", ErrUserNotFound
+	}
+
+	if err != nil {
+		return nil, "", err
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
+	if err != nil {
+		return nil, "", err
+	}
+
+	token, err := u.GenerateJWT(user.Email)
+	if err != nil {
+		return nil, "", err
+	}
+
+	return user, token, nil
 }
 
 // Create implements UserRepo.
@@ -61,7 +119,7 @@ func (u *service) UpdateByID(ctx context.Context, id string, user *User) error {
 	return u.userRepo.UpdateByID(ctx, id, user)
 }
 
-func NewUsersService(userRepo UserRepo) UserService {
+func NewUsersService(userRepo UserRepo) Service {
 	return &service{
 		userRepo: userRepo,
 	}

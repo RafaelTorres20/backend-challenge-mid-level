@@ -3,7 +3,6 @@ package postgres
 import (
 	"context"
 	"database/sql"
-	"fmt"
 
 	"github.com/RafaelTorres20/backend-challenge-mid-level/pkg/domain/users"
 	"github.com/rs/xid"
@@ -65,9 +64,6 @@ func (u *UsersRepository) DeleteByID(ctx context.Context, id string) error {
 // GetByEmail implements users.UserRepo.
 func (u *UsersRepository) GetByEmail(ctx context.Context, email string) (*users.User, error) {
 	row := u.db.QueryRow("select * from users where email = $1", email)
-	if row == nil {
-		return nil, users.ErrEmailNotFound
-	}
 
 	if row.Err() != nil {
 		return nil, row.Err()
@@ -76,7 +72,6 @@ func (u *UsersRepository) GetByEmail(ctx context.Context, email string) (*users.
 	user := new(users.User)
 	err := row.Scan(&user.ID, &user.Email, &user.Password)
 	if err != nil {
-		fmt.Println(err)
 		return nil, err
 	}
 

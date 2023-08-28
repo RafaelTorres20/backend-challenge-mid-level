@@ -2,7 +2,7 @@ package users
 
 import "context"
 
-type UserService interface {
+type Service interface {
 	// GetByID returns user by id
 	GetByID(ctx context.Context, id string) (*User, error)
 	// GetByEmail returns user by email
@@ -13,6 +13,10 @@ type UserService interface {
 	UpdateByID(ctx context.Context, id string, user *User) error
 	// Delete deletes user
 	DeleteByID(ctx context.Context, id string) error
+	// Login logs user in
+	Login(ctx context.Context, email, password string) (*User, string, error)
+	// GenerateJWT generates JWT token
+	GenerateJWT(email string) (string, error)
 }
 
 type UserRepo interface {
